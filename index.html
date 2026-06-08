@@ -1,0 +1,76 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Text Encryptor</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',sans-serif;background:#0f0f23;color:#fff;min-height:100vh;display:flex;justify-content:center;align-items:center}
+.ob{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.92);z-index:1000;display:flex;justify-content:center;align-items:center}.ob.hide{display:none}
+.oc{background:#1a1a3e;border-radius:20px;padding:40px;max-width:500px;width:90%;text-align:center}
+.oc h2{color:#e17055;font-size:28px;margin-bottom:8px}.oc .sub{color:#888;font-size:14px}
+.stps{margin:25px 0;text-align:left;display:flex;flex-direction:column;gap:18px}
+.st{display:flex;gap:14px;align-items:flex-start}.st .n{width:32px;height:32px;border-radius:50%;background:#e17055;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px}
+.st h4{font-size:14px;margin-bottom:2px}.st p{font-size:12px;color:#888;line-height:1.5}
+.oc button{padding:14px 40px;border:none;border-radius:10px;background:#e17055;color:#fff;font-size:16px;font-weight:600;cursor:pointer}
+.oc .sk{color:#555;font-size:12px;cursor:pointer;margin-top:12px;display:inline-block}
+.app{display:none;max-width:700px;width:100%;padding:20px;text-align:center}.app.show{display:block}
+h1{margin-bottom:5px}h1 span{background:linear-gradient(90deg,#e17055,#feca57);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sub2{color:#666;margin-bottom:20px;font-size:14px}
+.method-row{display:flex;justify-content:center;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.method-row button{padding:10px 20px;border:2px solid #333;border-radius:10px;background:transparent;color:#888;cursor:pointer;font-size:14px}
+.method-row button.active{background:#e17055;color:#fff;border-color:#e17055;font-weight:600}
+.shift-row{display:flex;justify-content:center;align-items:center;gap:10px;margin-bottom:15px;display:none}
+.shift-row label{color:#888;font-size:13px}
+.shift-row input{width:60px;padding:8px;border:1px solid #333;border-radius:8px;background:#0f0f23;color:#fff;text-align:center;font-size:16px}
+.shift-row input:focus{outline:none;border-color:#e17055}
+.panels{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:15px}
+@media(max-width:600px){.panels{grid-template-columns:1fr}}
+.panel{text-align:left}
+.panel label{display:block;font-size:12px;color:#666;margin-bottom:6px}
+.panel textarea{width:100%;height:150px;padding:12px;border:1px solid #333;border-radius:10px;background:#1a1a3e;color:#fff;font-family:monospace;font-size:13px;resize:vertical;line-height:1.6}
+.panel textarea:focus{outline:none;border-color:#e17055}
+.btns{display:flex;justify-content:center;gap:10px;margin-bottom:15px}
+.btns button{padding:12px 24px;border:none;border-radius:10px;background:#e17055;color:#fff;font-weight:600;cursor:pointer;font-size:14px}
+.btns button.secondary{background:transparent;border:1px solid #333;color:#fff}
+.btns button.secondary:hover{border-color:#e17055}
+.copy-btn{padding:8px 16px;border:1px solid #e17055;border-radius:8px;background:transparent;color:#e17055;cursor:pointer;font-size:12px}
+.info{background:#1a1a3e;border-radius:12px;padding:15px;text-align:left;font-size:12px;color:#888;line-height:1.6}
+.info strong{color:#e17055}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#e17055;color:#fff;padding:12px 24px;border-radius:10px;font-weight:600;opacity:0;transition:.3s}.toast.show{opacity:1}
+</style></head><body>
+<div class="ob" id="ob"><div class="oc">
+<h2>Text Encryptor</h2><p class="sub">Encrypt and decrypt messages with multiple methods</p>
+<div class="stps">
+<div class="st"><div class="n">1</div><div><h4>Choose a Method</h4><p>Select Caesar Cipher, ROT13, or Base64 encoding. Caesar lets you set a custom shift value.</p></div></div>
+<div class="st"><div class="n">2</div><div><h4>Enter Your Text</h4><p>Type or paste text in the Input panel on the left.</p></div></div>
+<div class="st"><div class="n">3</div><div><h4>Encrypt or Decrypt</h4><p>Click Encrypt to encode, or Decrypt to decode. The result appears on the right. Click Copy to save it.</p></div></div>
+</div>
+<button onclick="start()">Open Encryptor</button>
+<div class="sk" onclick="start()">Skip</div>
+</div></div>
+<div class="app" id="app">
+<h1><span>Text Encryptor</span></h1><p class="sub2">Encode and decode messages</p>
+<div class="method-row"><button class="active" onclick="setMethod('caesar',this)">Caesar Cipher</button><button onclick="setMethod('rot13',this)">ROT13</button><button onclick="setMethod('base64',this)">Base64</button></div>
+<div class="shift-row" id="shiftRow"><label>Shift:</label><input type="number" id="shift" value="3" min="1" max="25"></div>
+<div class="panels"><div class="panel"><label>Input</label><textarea id="input" placeholder="Type your text here..."></textarea></div><div class="panel"><label>Output <button class="copy-btn" onclick="copyOutput()">Copy</button></label><textarea id="output" readonly placeholder="Result appears here..."></textarea></div></div>
+<div class="btns"><button onclick="encrypt()">Encrypt &#9654;</button><button onclick="decrypt()">Decrypt &#9664;</button><button class="secondary" onclick="swap()">&#8644; Swap</button><button class="secondary" onclick="clear()">Clear</button></div>
+<div class="info" id="info"><strong>Caesar Cipher:</strong> Shifts each letter by a fixed number. With shift 3, A becomes D, B becomes E, etc. Julius Caesar used this to protect military messages!</div></div>
+<div class="toast" id="toast">Copied!</div>
+<script>
+var method='caesar';
+function start(){document.getElementById('ob').classList.add('hide');document.getElementById('app').classList.add('show');localStorage.setItem('te_seen','1')}
+if(localStorage.getItem('te_seen')){document.getElementById('ob').classList.add('hide');document.getElementById('app').classList.add('show')}
+function setMethod(m,btn){method=m;document.querySelectorAll('.method-row button').forEach(function(b){b.classList.remove('active')});btn.classList.add('active');
+document.getElementById('shiftRow').style.display=m==='caesar'?'flex':'none';
+var info={caesar:'<strong>Caesar Cipher:</strong> Shifts each letter by a fixed number. With shift 3, A becomes D, B becomes E, etc.',rot13:'<strong>ROT13:</strong> A special case of Caesar cipher with shift 13. Applying it twice returns the original text. Commonly used in online forums.',base64:'<strong>Base64:</strong> Encodes binary/text data into ASCII characters. Used in email attachments, data URLs, and API tokens. Not encryption, just encoding.'};
+document.getElementById('info').innerHTML=info[m]}
+function caesar(str,shift){return str.replace(/[a-zA-Z]/g,function(c){var base=c<='Z'?65:97;return String.fromCharCode((c.charCodeAt(0)-base+shift)%26+base)})}
+function encrypt(){
+var text=document.getElementById('input').value;if(!text)return;
+if(method==='caesar')document.getElementById('output').value=caesar(text,parseInt(document.getElementById('shift').value)||3);
+else if(method==='rot13')document.getElementById('output').value=caesar(text,13);
+else{try{document.getElementById('output').value=btoa(unescape(encodeURIComponent(text)))}catch(e){document.getElementById('output').value='Error: '+e.message}}}
+function decrypt(){
+var text=document.getElementById('input').value;if(!text)return;
+if(method==='caesar')document.getElementById('output').value=caesar(text,26-(parseInt(document.getElementById('shift').value)||3));
+else if(method==='rot13')document.getElementById('output').value=caesar(text,13);
+else{try{document.getElementById('output').value=decodeURIComponent(escape(atob(text)))}catch(e){document.getElementById('output').value='Error: Invalid Base64'}}}
+function swap(){var i=document.getElementById('input'),o=document.getElementById('output'),t=i.value;i.value=o.value;o.value=t}
+function clear(){document.getElementById('input').value='';document.getElementById('output').value=''}
+function copyOutput(){navigator.clipboard.writeText(document.getElementById('output').value);var t=document.getElementById('toast');t.classList.add('show');setTimeout(function(){t.classList.remove('show')},1500)}
+</script></body></html>
